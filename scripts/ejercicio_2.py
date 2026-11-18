@@ -11,7 +11,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 RUTA = Path(__file__).resolve().parents[1] / "data" / "raw" / "listings.csv.gz"
 
 def cargar_datos():
-    """Carga el CSV comprimido y crea una versión numérica del precio."""
+    # Carga el CSV comprimido y crea una versión numérica del precio.
     try:
         df = pd.read_csv(RUTA, compression="gzip")
     except FileNotFoundError:
@@ -27,7 +27,7 @@ def cargar_datos():
     return df
 
 def preparar(df, predictores):
-    """Convierte columnas, elimina faltantes y recorta el 1% inferior/superior."""
+    # Convierte columnas, elimina faltantes y recorta el 1% inferior/superior.
     # Comprobación de columnas requeridas
     faltan = set(predictores) - set(df.columns)
     assert not faltan, f"Faltan columnas: {faltan}"
@@ -56,7 +56,7 @@ def preparar(df, predictores):
     return datos
 
 def evaluar(y_real, y_pred):
-    """Calcula y muestra métricas de regresión."""
+    # Calcula y muestra métricas de regresión.
     mae = mean_absolute_error(y_real, y_pred)
     rmse = np.sqrt(mean_squared_error(y_real, y_pred))
     r2 = r2_score(y_real, y_pred)
