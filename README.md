@@ -16,7 +16,6 @@ un modelo de regresión k-NN.
 │   ├── ejercicio_2.py
 │   └── ejercicio_5.py
 ├── .gitignore
-├── LICENSE
 ├── README.md
 └── requirements.txt
 ```
@@ -80,10 +79,3 @@ interpretar o comparar métricas, verifica la moneda y el período del dataset.
 El modelo lineal usa solo dormitorios, mientras que la distancia del modelo
 k-NN combina dos variables geográficas y dos características del alojamiento,
 por lo que no representa una distancia física.
-
-## Licencias
-
-La licencia MIT de este repositorio se aplica al código fuente del proyecto.
-No se ha proporcionado información sobre la licencia o autorización de
-redistribución del dataset. Verifica las condiciones de su fuente antes de
-publicarlo o reutilizarlo.

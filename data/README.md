@@ -12,7 +12,6 @@ directamente con pandas.
   `latitude`, `longitude` y `accommodates`
 
 No se incluyeron metadatos sobre la fuente original, el método de recolección ni
-la licencia del dataset. El archivo contiene campos descriptivos de anuncios y
-anfitriones; confirma que su redistribución pública está permitida antes de
-publicar este repositorio. La licencia MIT en la raíz cubre el código, no los
-datos.
+las condiciones de redistribución del dataset. El archivo contiene campos
+descriptivos de anuncios y anfitriones; confirma que su redistribución pública
+está permitida antes de publicar este repositorio.
