@@ -118,6 +118,14 @@ def graficar_resultados(datos, modelo):
     plt.ylabel("Precio nocturno")
 
     plt.tight_layout()
+    RUTA_FIGURAS = Path(__file__).resolve().parents[1] / "reports" / "figures"
+    RUTA_FIGURAS.mkdir(parents=True, exist_ok=True)
+
+    plt.savefig(
+        RUTA_FIGURAS / "ejercicio_2.png",
+        dpi=300,
+        bbox_inches="tight"
+    )
     plt.show()
 
 

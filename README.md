@@ -15,6 +15,10 @@ un modelo de regresión k-NN.
 ├── scripts/
 │   ├── ejercicio_2.py
 │   └── ejercicio_5.py
+├── reports/
+│   ├── figures
+│       ├── ejercicio_2.png
+│       └── ejercicio_5.png
 ├── .gitignore
 ├── README.md
 └── requirements.txt
@@ -25,6 +29,7 @@ un modelo de regresión k-NN.
 - Python 3.10 o posterior
 - Las dependencias listadas en [`requirements.txt`](requirements.txt)
 
+
 ## Instalación
 
 Desde la carpeta raíz del proyecto:
@@ -32,38 +37,45 @@ Desde la carpeta raíz del proyecto:
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-En Windows, activa el entorno con:
+En Windows, crear y activar el entorno con:
 
 ```powershell
+python -m venv .venv
 .venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
 ```
 
 ## Ejecución
 
-Los scripts buscan el dataset dentro de `data/raw/`, sin depender de la carpeta
-desde la que se invoquen:
+Desde la carpeta raíz del proyecto, ejecutar:
 
 ```bash
 python scripts/ejercicio_2.py
 python scripts/ejercicio_5.py
 ```
 
-Ambos programas imprimen métricas y resultados en la terminal. También abren
-gráficos interactivos; para verlos, ejecútalos en un entorno con interfaz
-gráfica.
+Los programas cargan automáticamente el dataset ubicado en `data/raw/listings.csv.gz`.
+
+Ambos scripts imprimen en la terminal las métricas, predicciones y resultados solicitados, y generan los gráficos correspondientes.
 
 ## Ejercicios
 
-- **Ejercicio 2:** regresión lineal del precio en función de dormitorios,
-  limitada a alojamientos de tipo `Entire home/apt` cuando esa columna existe.
-  Muestra métricas, una estimación para dos dormitorios y gráficos.
-- **Ejercicio 5:** regresión k-NN con latitud, longitud, capacidad y dormitorios.
-  Estandariza las variables mediante un `Pipeline` y muestra los vecinos más
-  cercanos y la comparación entre valores reales y estimados.
+- **Ejercicio 2:** utiliza Regresión Lineal Simple para estimar el precio nocturno
+  a partir de la cantidad de dormitorios. Se elige este modelo porque la variable
+  objetivo es numérica continua y se busca representar una relación lineal simple
+  y fácil de interpretar. Cuando `room_type` está disponible, el análisis se limita
+  a alojamientos de tipo `Entire home/apt`. El programa muestra métricas, una
+  estimación para dos dormitorios y gráficos.
+- **Ejercicio 5:** utiliza k-NN para regresión con latitud, longitud, capacidad
+  y dormitorios como predictores. Se elige este modelo porque permite estimar
+  un precio numérico continuo comparando cada alojamiento con otros de ubicación
+  y características físicas similares. Las variables se estandarizan mediante
+  un `Pipeline` con `StandardScaler`, y el programa muestra los vecinos más
+  cercanos, sus distancias estandarizadas y la comparación entre valores reales
+  y estimados.
 
 ## Datos y limitaciones
 
@@ -71,11 +83,10 @@ El dataset comprimido se encuentra en [`data/raw/listings.csv.gz`](data/raw/list
 Su descripción, procedencia y consideraciones de distribución están en
 [`data/README.md`](data/README.md).
 
-Los scripts eliminan filas incompletas y recortan los precios fuera de los
-percentiles 1 y 99 antes de separar entrenamiento y prueba. Por tanto, los
-percentiles se calculan sobre el conjunto completo; esta limitación se imprime
-al ejecutar el análisis. El precio se extrae de la columna `price`; antes de
+Los scripts eliminan filas incompletas, descartan registros imposibles y recortan
+los precios fuera de los percentiles 1 y 99 antes de separar entrenamiento y prueba. 
+El precio se extrae de la columna `price`; antes de
 interpretar o comparar métricas, verifica la moneda y el período del dataset.
-El modelo lineal usa solo dormitorios, mientras que la distancia del modelo
-k-NN combina dos variables geográficas y dos características del alojamiento,
-por lo que no representa una distancia física.
+El modelo lineal utiliza únicamente la cantidad de dormitorios como predictor.
+En el modelo k-NN, las distancias se calculan sobre las variables estandarizadas,
+por lo que no deben interpretarse como distancias físicas en kilómetros.
