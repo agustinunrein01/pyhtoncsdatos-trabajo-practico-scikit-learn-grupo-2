@@ -35,15 +35,21 @@ def preparar(df, predictores):
     datos = df[columnas].copy()
     for col in predictores:
         datos[col] = pd.to_numeric(datos[col], errors="coerce")
+
     datos = datos.dropna()
-    datos = datos[(datos["price_num"] > 0)]
+
+    # Eliminación de registros imposibles
+    datos = datos[datos["price_num"] > 0]
+    datos = datos[datos["bedrooms"] >= 0]
+    datos = datos[datos["accommodates"] > 0]
+    datos = datos[datos["latitude"].between(-90, 90)]
+    datos = datos[datos["longitude"].between(-180, 180)]
     
     q01, q99 = datos["price_num"].quantile([0.01, 0.99])
     datos = datos[datos["price_num"].between(q01, q99)]
     
     print("Nota: Se eliminan precios atípicos (el 1% inferior y el 1% superior).")
     print("Justificación: Se eliminan para evitar que propiedades atípicas sesguen las distancias.")
-    print("Fuga de datos: Los percentiles se calcularon sobre todo el dataset antes de separar train/test; es una fuga mínima asumida como limpieza.")
     return datos
 
 def evaluar(y_real, y_pred):
@@ -55,6 +61,29 @@ def evaluar(y_real, y_pred):
     print(f"RMSE: {rmse:.2f}")
     print(f"R²:   {r2:.3f}")
     return mae, rmse, r2
+
+def graficar_resultados(y_test, y_pred):
+    """Genera un gráfico de valores reales frente a valores predichos."""
+
+    plt.figure(figsize=(6, 6))
+    plt.scatter(y_test, y_pred, alpha=0.3)
+
+    lim = [y_test.min(), y_test.max()]
+    plt.plot(
+        lim,
+        lim,
+        color="crimson",
+        label="Predicción perfecta"
+    )
+
+    plt.xlabel("Precio real")
+    plt.ylabel("Precio predicho")
+    plt.title("k-NN (k=7): real vs. predicho")
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()
+
 
 if __name__ == "__main__":
     df = cargar_datos()
@@ -68,7 +97,14 @@ if __name__ == "__main__":
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.25, random_state=42
         )
-        
+
+        print("\n--- MODELO SELECCIONADO ---")
+        print(
+            "Se utiliza k-NN para regresión porque se busca estimar una variable "
+            "numérica continua (precio) comparando alojamientos con ubicación "
+            "y características físicas similares.")
+
+
         modelo = Pipeline([
             ("escalador", StandardScaler()),
             ("knn", KNeighborsRegressor(n_neighbors=7, weights="distance"))
@@ -102,21 +138,36 @@ if __name__ == "__main__":
         print(comparacion.head(10))
         
         print("\n--- EXPLICACIÓN DEL ESCALADO E INTERPRETACIÓN ---")
-        print("Sin escalar, las variables con números más grandes dominarían el cálculo de la distancia, mientras que la latitud y la longitud (que varían en decimales) casi no tendrían peso.")
-        print("Es clave destacar que 2 de las 4 variables son de ubicación. Esto provoca que la geografía pese aproximadamente la mitad en la similitud. Como cada coordenada se escala por separado, la 'distancia' k-NN no se puede leer como kilómetros físicos.")
+        print(
+            "Sin escalar, las variables con magnitudes numéricas mayores podrían dominar "
+            "el cálculo de las distancias."
+        )
+        print(
+            "StandardScaler coloca las variables en escalas comparables antes de aplicar k-NN, "
+            "evitando que una variable tenga mayor influencia solamente por su escala."
+        )
+        print(
+            "La distancia calculada por k-NN corresponde al espacio estandarizado y no debe "
+            "interpretarse como una distancia física en kilómetros."
+        )
         
         print("\n--- CONCLUSIÓN ---")
-        print("El modelo de vecinos más cercanos estima eficientemente el precio contrastando propiedades con características y ubicación similares.")
-        print("La estandarización dentro del pipeline previene la fuga de datos, ajustándose solo con los datos de entrenamiento para brindar una predicción imparcial y precisa.")
+        print(
+            "El modelo k-NN estima el precio comparando cada alojamiento con otros de "
+            "ubicación y características físicas similares."
+        )
+        print(
+            "La estandarización dentro del pipeline permite calcular las distancias sobre "
+            "variables expresadas en escalas comparables."
+        )
+        print(
+            "Los resultados muestran un desempeño moderado, por lo que el modelo logra "
+            "captar parte de la variabilidad del precio, aunque no toda."
+        )
+        print(
+            "La dispersión entre valores reales y predichos indica que existen otros "
+            "factores relevantes que no están incluidos entre los predictores utilizados."
+        )
         
         # Gráfico Real vs Predicho
-        plt.figure(figsize=(6, 6))
-        plt.scatter(y_test, y_pred, alpha=0.3)
-        lim = [y_test.min(), y_test.max()]
-        plt.plot(lim, lim, color="crimson", label="Predicción perfecta")
-        plt.xlabel("Precio real")
-        plt.ylabel("Precio predicho")
-        plt.title("k-NN (k=7): real vs. predicho")
-        plt.legend()
-        plt.tight_layout()
-        plt.show()
+        graficar_resultados(y_test, y_pred)
