@@ -1,3 +1,12 @@
+"""
+Ejercicio 2 - Regresión Lineal Simple
+
+Estima el precio nocturno de alojamientos de Buenos Aires utilizando
+la cantidad de dormitorios como único predictor.
+
+Fuente de datos: Inside Airbnb.
+"""
+
 from pathlib import Path
 
 import numpy as np
@@ -43,7 +52,8 @@ def preparar(df, predictores):
     for col in predictores:
         datos[col] = pd.to_numeric(datos[col], errors="coerce")
     datos = datos.dropna()
-    datos = datos[(datos["price_num"] > 0)]
+    datos = datos[datos["bedrooms"] >= 0]
+    datos = datos[datos["price_num"] > 0]
     
     # Filtro del 1% al 99%
     q01, q99 = datos["price_num"].quantile([0.01, 0.99])
@@ -51,7 +61,6 @@ def preparar(df, predictores):
     
     print("Nota: Se eliminan precios atípicos (el 1% inferior y el 1% superior).")
     print("Justificación: Se eliminan precios atípicos (errores de carga o propiedades de lujo) que sesgarían la pendiente del modelo.")
-    print("Fuga de datos: Los percentiles se calcularon sobre todo el dataset antes de separar train y test; si bien es una fuga mínima, se asume como limpieza de errores y no como aprendizaje.")
     
     return datos
 
@@ -64,6 +73,53 @@ def evaluar(y_real, y_pred):
     print(f"RMSE: {rmse:.2f}")
     print(f"R²:   {r2:.3f}")
     return mae, rmse, r2
+
+def graficar_resultados(datos, modelo):
+    """Genera el gráfico de regresión y el boxplot de precios por dormitorios."""
+
+    muestra = datos.sample(
+        min(1500, len(datos)),
+        random_state=42
+    ).sort_values("bedrooms")
+
+    plt.figure(figsize=(12, 5))
+
+    plt.subplot(1, 2, 1)
+    plt.scatter(
+        muestra["bedrooms"],
+        muestra["price_num"],
+        alpha=0.25,
+        label="Anuncios"
+    )
+
+    plt.plot(
+        muestra["bedrooms"],
+        modelo.predict(muestra[["bedrooms"]]),
+        color="crimson",
+        linewidth=2,
+        label="Recta estimada"
+    )
+
+    plt.xlabel("bedrooms")
+    plt.ylabel("Precio nocturno")
+    plt.title("Dormitorios vs Precio")
+    plt.legend()
+
+    plt.subplot(1, 2, 2)
+    sns.boxplot(
+        x="bedrooms",
+        y="price_num",
+        data=muestra,
+        color="lightblue"
+    )
+
+    plt.title("Distribución (Boxplot)")
+    plt.xlabel("bedrooms")
+    plt.ylabel("Precio nocturno")
+
+    plt.tight_layout()
+    plt.show()
+
 
 if __name__ == "__main__":
     df = cargar_datos()
@@ -81,6 +137,14 @@ if __name__ == "__main__":
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.25, random_state=42
         )
+
+        print("\n--- MODELO SELECCIONADO ---")
+        print(
+        "Se utiliza Regresión Lineal Simple porque se busca estimar una variable "
+        "numérica continua (precio) a partir de un único predictor (dormitorios), "
+        "mediante una relación lineal fácil de interpretar."
+        )
+
         
         modelo = LinearRegression()
         modelo.fit(X_train, y_train)
@@ -100,28 +164,8 @@ if __name__ == "__main__":
         
         print("\n--- CONCLUSIÓN ---")
         print("La regresión lineal refleja que, en promedio, añadir un dormitorio incrementa el precio nocturno según lo marcado por la pendiente.")
-        print("Si bien el modelo identifica la tendencia, un R² bajo indicaría que el número de dormitorios no basta para predecir con exactitud el precio.")
+        print("Si bien el modelo identifica la tendencia, El R² obtenido es bajo, lo que indica que el número de dormitorios por sí solo no basta para predecir con exactitud el precio.")
         print("Es importante verificar la moneda de origen de los datos para interpretar adecuadamente el MAE y el RMSE en el contexto real.")
         
         # Gráficos (Scatter y Boxplot)
-        muestra = datos.sample(min(1500, len(datos)), random_state=42).sort_values("bedrooms")
-        
-        plt.figure(figsize=(12, 5))
-        
-        plt.subplot(1, 2, 1)
-        plt.scatter(muestra["bedrooms"], muestra["price_num"], alpha=0.25, label="Anuncios")
-        plt.plot(muestra["bedrooms"], modelo.predict(muestra[["bedrooms"]]),
-                 color="crimson", linewidth=2, label="Recta estimada")
-        plt.xlabel("bedrooms")
-        plt.ylabel("Precio nocturno")
-        plt.title("Dormitorios vs Precio")
-        plt.legend()
-        
-        plt.subplot(1, 2, 2)
-        sns.boxplot(x="bedrooms", y="price_num", data=muestra, color="lightblue")
-        plt.title("Distribución (Boxplot)")
-        plt.xlabel("bedrooms")
-        plt.ylabel("Precio nocturno")
-        
-        plt.tight_layout()
-        plt.show()
+        graficar_resultados(datos, modelo)
