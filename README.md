@@ -12,7 +12,7 @@ un modelo de regresión k-NN.
 │   ├── README.md
 │   └── raw/
 │       └── listings.csv.gz
-├── scripts/
+├── src/
 │   ├── ejercicio_2.py
 │   └── ejercicio_5.py
 ├── reports/
@@ -53,8 +53,8 @@ python -m pip install -r requirements.txt
 Desde la carpeta raíz del proyecto, ejecutar:
 
 ```bash
-python scripts/ejercicio_2.py
-python scripts/ejercicio_5.py
+python src/ejercicio_2.py
+python src/ejercicio_5.py
 ```
 
 Los programas cargan automáticamente el dataset ubicado en `data/raw/listings.csv.gz`.
