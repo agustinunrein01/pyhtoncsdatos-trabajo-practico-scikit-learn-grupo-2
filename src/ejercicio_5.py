@@ -99,6 +99,13 @@ if __name__ == "__main__":
     if df is not None:
         predictores = ["latitude", "longitude", "accommodates", "bedrooms"]
         datos = preparar(df, predictores)
+        RUTA_PROCESADOS = Path(__file__).resolve().parents[1] / "data" / "processed"
+        RUTA_PROCESADOS.mkdir(parents=True, exist_ok=True)
+
+        datos.to_csv(
+            RUTA_PROCESADOS / "ejercicio_5.csv",
+            index=False
+        )
         X = datos[predictores]
         y = datos["price_num"]
         

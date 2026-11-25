@@ -138,7 +138,16 @@ if __name__ == "__main__":
         else:
             df_ej = df.copy()
 
-        datos = preparar(df_ej, ["bedrooms"])
+       datos = preparar(df_ej, ["bedrooms"])
+
+        RUTA_PROCESADOS = Path(__file__).resolve().parents[1] / "data" / "processed"
+        RUTA_PROCESADOS.mkdir(parents=True, exist_ok=True)
+
+        datos.to_csv(
+            RUTA_PROCESADOS / "ejercicio_2.csv",
+            index=False
+        )
+
         X = datos[["bedrooms"]]
         y = datos["price_num"]
         
