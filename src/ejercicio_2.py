@@ -131,7 +131,7 @@ def graficar_resultados(datos, modelo):
 
 if __name__ == "__main__":
     df = cargar_datos()
-    
+
     if df is not None:
         if "room_type" in df.columns:
             df_ej = df[df["room_type"] == "Entire home/apt"].copy()
@@ -150,7 +150,7 @@ if __name__ == "__main__":
 
         X = datos[["bedrooms"]]
         y = datos["price_num"]
-        
+
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.25, random_state=42
         )
