@@ -12,6 +12,9 @@ un modelo de regresión k-NN.
 │   ├── README.md
 │   └── raw/
 │       └── listings.csv.gz
+    └── processed/
+         ├── ejercicio_2.csv
+│        └── ejercicio_5.csv
 ├── src/
 │   ├── ejercicio_2.py
 │   └── ejercicio_5.py
